@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/hooks/use-toast";
 
 const userItems = [
   {
@@ -23,6 +24,22 @@ const userItems = [
 ];
 
 export const ProfilePage = () => {
+  const { toast } = useToast();
+
+  const handleEditProfile = () => {
+    toast({
+      title: "Edit Profile",
+      description: "Profile editing form would open here.",
+    });
+  };
+
+  const handleViewItem = (itemId: number, itemTitle: string) => {
+    toast({
+      title: `Viewing ${itemTitle}`,
+      description: "Item details would open in a modal or detailed view.",
+    });
+  };
+
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
       {/* Profile Header */}
@@ -39,7 +56,7 @@ export const ProfilePage = () => {
                   <CardTitle className="text-2xl">John Doe</CardTitle>
                   <CardDescription>Member since January 2024</CardDescription>
                 </div>
-                <Button variant="outline">
+                <Button variant="outline" onClick={handleEditProfile}>
                   <Edit className="h-4 w-4 mr-2" />
                   Edit Profile
                 </Button>
@@ -122,6 +139,13 @@ export const ProfilePage = () => {
                     <Badge variant={item.status === "returned" ? "default" : "outline"}>
                       {item.status === "returned" ? "Returned" : "Active"}
                     </Badge>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => handleViewItem(item.id, item.title)}
+                    >
+                      View
+                    </Button>
                   </div>
                 </div>
                 {index < userItems.length - 1 && <Separator className="mt-4" />}

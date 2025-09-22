@@ -5,15 +5,42 @@ import { ProfilePage } from "@/components/ProfilePage";
 import { ReportPage } from "@/components/ReportPage";
 import { NotificationsPage } from "@/components/NotificationsPage";
 import { AdminPage } from "@/components/AdminPage";
+import { AuthSystem } from "@/components/AuthSystem";
+
+interface UserData {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  joinedDate: string;
+}
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("home");
-  const [notificationCount] = useState(3); // Mock notification count
+  const [notificationCount, setNotificationCount] = useState(3);
+  const [user, setUser] = useState<UserData | null>(null);
+  const [recentItems, setRecentItems] = useState<any[]>([]);
+
+  const handleAuthSuccess = (userData: UserData) => {
+    setUser(userData);
+  };
+
+  const handleItemsUpdate = (items: any[]) => {
+    setRecentItems(items);
+    setNotificationCount(prev => prev + 1);
+  };
 
   const renderContent = () => {
     switch (activeTab) {
       case "home":
-        return <HomePage />;
+        return (
+          <HomePage 
+            onNavigateToReport={() => setActiveTab("report")}
+            userName={user?.name || "User"}
+            recentItems={recentItems}
+            onItemsUpdate={handleItemsUpdate}
+          />
+        );
       case "profile":
         return <ProfilePage />;
       case "report":
@@ -23,28 +50,34 @@ const Index = () => {
       case "admin":
         return <AdminPage />;
       default:
-        return <HomePage />;
+        return (
+          <HomePage 
+            onNavigateToReport={() => setActiveTab("report")}
+            userName={user?.name || "User"}
+            recentItems={recentItems}
+            onItemsUpdate={handleItemsUpdate}
+          />
+        );
     }
   };
 
   const handleTabChange = (tab: string) => {
-    if (tab === "admin") {
-      // In real app, check admin permissions
-      setActiveTab(tab);
-    } else {
-      setActiveTab(tab);
-    }
+    setActiveTab(tab);
   };
+
+  if (!user) {
+    return <AuthSystem onAuthSuccess={handleAuthSuccess} />;
+  }
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation 
+      <Navigation
         activeTab={activeTab} 
         onTabChange={handleTabChange}
         notificationCount={notificationCount}
       />
       <main>
-        {activeTab === "admin" ? <AdminPage /> : renderContent()}
+        {renderContent()}
       </main>
     </div>
   );
